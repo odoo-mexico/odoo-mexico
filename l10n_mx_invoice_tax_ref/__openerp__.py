@@ -36,10 +36,12 @@
     "license" : "AGPL-3",
     "depends" : [
         "account",
+        "account_tax_category",
     ],
     "init_xml" : [],
     "demo_xml" : [],
     "update_xml" : [
+        'invoice_view.xml',
     ],
     "installable" : True,
     "active" : False,
