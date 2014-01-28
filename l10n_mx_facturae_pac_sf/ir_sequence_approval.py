@@ -35,12 +35,12 @@ class ir_sequence_approval(osv.Model):
         types = super(ir_sequence_approval, self)._get_type(
             cr, uid, ids, context=context)
         types.extend([
-            ('cfdi32', 'CFDI 3.2 Solución Factible'),
+            ('cfdi32_pac_sf', 'CFDI 3.2 Solución Factible'),
         ])
         return types
 
     _columns = {
         'type': fields.selection(_get_type, 'Type', type='char', size=64,
-            required=True, help="Type of Electronic Invoice"),
+                                 required=True, help="Type of Electronic Invoice"),
     }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

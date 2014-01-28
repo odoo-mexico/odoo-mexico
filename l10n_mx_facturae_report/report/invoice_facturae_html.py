@@ -33,10 +33,13 @@ from openerp import tests
 from openerp.osv import osv
 from openerp import netsvc
 import openerp
-
+from report_webkit import webkit_report
+import datetime
 
 class invoice_facturae_html(report_sxw.rml_parse):
-    def __init__(self, cr, uid, name, context):
+    def __init__(self, cr, uid, name, context=None):
+        if context is None:
+            context = {}
         super(invoice_facturae_html, self).__init__(
             cr, uid, name, context=context)
         self.localcontext.update({
@@ -55,6 +58,7 @@ class invoice_facturae_html(report_sxw.rml_parse):
             'get_sum_total': self._get_sum_total,
             'has_disc': self._has_disc,
             'get_data_certificate': self._get_data_certificate,
+            'get_text_promissory' : self._get_text_promissory,
         })
         self.taxes = []
 
@@ -228,7 +232,7 @@ class invoice_facturae_html(report_sxw.rml_parse):
         pac_params_ids = pac_params_obj.search(self.cr, self.uid, [
             ('method_type', '=', 'pac_sf_firmar'),
             ('company_id', '=', invoice.company_id.id), 
-            ('active', '=', True)], limit=1, context={})
+            ('active', '=', True)], limit=1)
         pac_params_id = pac_params_ids and pac_params_ids[0] or False
         if pac_params_id:
             data_pac = pac_params_obj.browse(self.cr, self.uid, pac_params_id)
@@ -237,9 +241,27 @@ class invoice_facturae_html(report_sxw.rml_parse):
             })
         return res
         
+    def _get_text_promissory(self, company, partner, address_emitter, invoice):
+        text = ''
+        context = {}
+        lang = self.pool.get('res.partner').browse(self.cr, self.uid,\
+            partner.id).lang
+        if lang:
+            context.update({'lang' : lang})
+        company = self.pool.get('res.company').browse(self.cr, self.uid,\
+            company.id, context=context)
+        if company.dinamic_text:
+            try:
+                if company.dict_var:
+                    text = company.dinamic_text % eval("{" + company.dict_var + "}")
+                else:
+                    text = company.dinamic_text
+            except:
+                return text
+        return text
         
 
-report_sxw.report_sxw('report.account.invoice.facturae.webkit',
+webkit_report.WebKitParser('report.account.invoice.facturae.webkit',
             'account.invoice',
             'addons/l10n_mx_facturae_report/report/invoice_facturae_html.mako',
             parser=invoice_facturae_html)

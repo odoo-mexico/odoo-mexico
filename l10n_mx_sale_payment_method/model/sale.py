@@ -53,13 +53,14 @@ class inherits_sale(osv.Model):
 
     def _prepare_invoice(self, cr, uid, order, lines, context=None):            
         '''Overwrite this method to send the payment term new to invoice '''
-        
+        if context is None:
+            context = {}
         res = super(inherits_sale,self)._prepare_invoice(cr, uid, order,
                                                          lines, context)
         res.update({'pay_method_id':order.pay_method_id and\
-                                        order.pay_method_id.id,
+                                        order.pay_method_id.id or False,
                     'acc_payment':order.acc_payment and\
-                                        order.acc_payment.id,
+                                        order.acc_payment.id or False,
         })
 
         return res 
@@ -68,7 +69,8 @@ class inherits_sale(osv.Model):
     def onchange_partner_id(self, cr, uid, ids, part, context=None):                
 
         '''Overwrite this method to set payment term new to sale order '''
-
+        if context is None:
+            context = {}
         res = super(inherits_sale,self).onchange_partner_id(cr, uid, ids,
                                                             part, context)
         part = self.pool.get('res.partner').browse(cr, uid, part, context)
@@ -80,7 +82,7 @@ class inherits_sale(osv.Model):
                                         [('partner_id', '=', part.id)])
         res.get('value',{}).update({                                                                     
             'pay_method_id': payment_term,                                           
-            'acc_payment': bank_partner_id and bank_partner_id[0],                                           
+            'acc_payment': bank_partner_id and bank_partner_id[0] or False,
         })                                                                           
 
         return res 

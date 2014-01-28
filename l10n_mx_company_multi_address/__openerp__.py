@@ -34,14 +34,12 @@
     """,
     "website" : "http://www.vauxoo.com/",
     "license" : "AGPL-3",
-    "depends" : ["account",
+    "depends" : ["account", "l10n_mx_states", "l10n_mx_partner_address",
         ],
-    "init_xml" : [],
-    "demo_xml" : [],
-    "update_xml" : [
+    "demo" : ["demo/l10n_mx_company_multi_address_demo.xml",],
+    "data" : [
         #'security/ir.model.access.csv',
         "invoice_view_address.xml",
-        
         #"ir_sequence_view.xml",
         #"res_company_view6.xml",
         #"invoice_view.xml",

@@ -118,7 +118,7 @@ msg2 = "Contact you administrator &/or to info@vauxoo.com"
 class account_invoice(osv.Model):
     _inherit = 'account.invoice'
 
-    def create_report(self, cr, uid, res_ids, report_name=False, file_name=False):
+    def create_report(self, cr, uid, res_ids, report_name=False, file_name=False, context=None):
         """
         @param report_name : Name of report with the name of object more type
             of report
@@ -126,12 +126,14 @@ class account_invoice(osv.Model):
             name of report that is 'openerp___facturae__' more six random
             characters for no files duplicate
         """
+        if context is None:
+                context = {}
         if not report_name or not res_ids:
             return (False, Exception('Report name and Resources ids are required !!!'))
         # try:
         ret_file_name = file_name+'.pdf'
         service = netsvc.LocalService("report."+report_name)
-        (result, format) = service.create(cr, uid, res_ids, {}, {})
+        (result, format) = service.create(cr, uid, res_ids, report_name, context=context)
         fp = open(ret_file_name, 'wb+')
         fp.write(result)
         fp.close()
@@ -140,15 +142,14 @@ class account_invoice(osv.Model):
             # return (False,str(e))
         return (True, ret_file_name)
 
-    def create_report_pdf(self, cr, uid, ids, context={}):
-        if not context:
+    def create_report_pdf(self, cr, uid, ids, context=None):
+        if context is None:
             context = {}
-        id = ids[0]
+        ids = isinstance(ids, (int, long)) and [ids] or ids
         (fileno, fname) = tempfile.mkstemp(
             '.pdf', 'openerp_' + (False or '') + '__facturae__')
         os.close(fileno)
-        file = self.create_report(cr, uid, [
-                                  id], "account.invoice.facturae.pdf", fname)
+        file = self.create_report(cr, uid, ids, "account.invoice.facturae.pdf", fname)
         is_file = file[0]
         fname = file[1]
         if is_file and os.path.isfile(fname):
@@ -161,7 +162,7 @@ class account_invoice(osv.Model):
                 'datas_fname': context.get('fname'),
                 'description': 'Factura-E PDF',
                 'res_model': self._name,
-                'res_id': id,
+                'res_id': ids,
             }
             self.pool.get('ir.attachment').create(
                 cr, uid, data_attach, context=context)
@@ -213,8 +214,8 @@ class account_invoice(osv.Model):
                           (ref, move_id))
         return True
 
-    def _get_fname_invoice(self, cr, uid, ids, field_names=None, arg=False, context={}):
-        if not context:
+    def _get_fname_invoice(self, cr, uid, ids, field_names=None, arg=False, context=None):
+        if context is None:
             context = {}
         res = {}
         sequence_obj = self.pool.get('ir.sequence')
@@ -245,6 +246,7 @@ class account_invoice(osv.Model):
         return res
 
     def action_cancel_draft(self, cr, uid, ids, *args):
+        ids = isinstance(ids, (int, long)) and [ids] or ids
         self.write(cr, uid, ids, {
             'no_certificado': False,
             'certificado': False,
@@ -255,6 +257,9 @@ class account_invoice(osv.Model):
         return super(account_invoice, self).action_cancel_draft(cr, uid, ids, args)
 
     def action_cancel(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
         self.write(cr, uid, ids, {
                    'date_invoice_cancel': time.strftime('%Y-%m-%d %H:%M:%S')})
         return super(account_invoice, self).action_cancel(cr, uid, ids, context=context)
@@ -315,6 +320,7 @@ class account_invoice(osv.Model):
             help='Attachment that generated this invoice'),
         'rate': fields.float('Type of Change', readonly=True,
             help='Rate used in the date of invoice'),
+        'pac_id': fields.many2one('params.pac', 'Pac', help='Pac used in singned of the invoice'),
     }
 
     _defaults = {
@@ -348,8 +354,8 @@ class account_invoice(osv.Model):
         os.close(fileno)
         return fname
 
-    def _get_file_globals(self, cr, uid, ids, context={}):
-        if not context:
+    def _get_file_globals(self, cr, uid, ids, context=None):
+        if context is None:
             context = {}
         id = ids and ids[0] or False
         file_globals = {}
@@ -444,11 +450,18 @@ class account_invoice(osv.Model):
             else:
                 raise osv.except_osv(_('Warning !'), _(
                     'Check date of invoice and the validity of certificate, & that the register of the certificate is active.\n%s!') % (msg2))
-
+        
         invoice_datetime = self.browse(cr, uid, ids)[0].invoice_datetime
+        ir_seq_app_obj = self.pool.get('ir.sequence.approval')
+        invoice = self.browse(cr, uid, ids[0], context=context)
+        sequence_app_id = ir_seq_app_obj.search(cr, uid, [(
+            'sequence_id', '=', invoice.invoice_sequence_id.id)], context=context)
+        if sequence_app_id:
+            type_inv = ir_seq_app_obj.browse(
+                cr, uid, sequence_app_id[0], context=context).type
         if invoice_datetime < '2012-07-01 00:00:00':
             return file_globals
-        else:
+        elif 'cfd' in type_inv and not 'cfdi' in type_inv:
             # Search char "," for addons_path, now is multi-path
             all_paths = tools.config["addons_path"].split(",")
             for my_path in all_paths:
@@ -458,21 +471,32 @@ class account_invoice(osv.Model):
                         my_path, 'l10n_mx_facturae', 'SAT',
                         'cadenaoriginal_2_2_l.xslt') or ''
                     break
+        elif 'cfdi' in type_inv:
+            # Search char "," for addons_path, now is multi-path
+            all_paths = tools.config["addons_path"].split(",")
+            for my_path in all_paths:
+                if os.path.isdir(os.path.join(my_path, 'l10n_mx_facturae', 'SAT')):
+                    # If dir is in path, save it on real_path
+                    file_globals['fname_xslt'] = my_path and os.path.join(
+                        my_path, 'l10n_mx_facturae', 'SAT','cadenaoriginal_3_2',
+                        'cadenaoriginal_3_2_l.xslt') or ''
         return file_globals
 
-    def _____________get_facturae_invoice_txt_data(self, cr, uid, ids, context={}):
+    def _____________get_facturae_invoice_txt_data(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
         # TODO: Transform date to fmt %d/%m/%Y %H:%M:%S
         certificate_lib = self.pool.get('facturae.certificate.library')
         fname_repmensual_xslt = self._get_file_globals(
             cr, uid, ids, context=context)['fname_repmensual_xslt']
-        fname_tmp = certificate_lib.b64str_to_tempfile(base64.encodestring(''),
+        fname_tmp = certificate_lib.b64str_to_tempfile(cr, uid, ids, base64.encodestring(''),
             file_suffix='.txt', file_prefix='openerp__' + (False or '') + \
             '__repmensual__')
         rep_mensual = ''
         for invoice in self.browse(cr, uid, ids, context=context):
             xml_b64 = invoice.cfd_xml_id and invoice.cfd_xml_id.datas or False
             if xml_b64:
-                fname_xml = certificate_lib.b64str_to_tempfile(
+                fname_xml = certificate_lib.b64str_to_tempfile(cr, uid, ids,
                     xml_b64 or '', file_suffix='.xml',
                     file_prefix='openerp__' + (False or '') + '__xml__')
                 rep_mensual += certificate_lib._transform_xml(
@@ -481,7 +505,9 @@ class account_invoice(osv.Model):
                 rep_mensual += '\r\n'
         return rep_mensual, fname_tmp
 
-    def _get_facturae_invoice_txt_data(self, cr, uid, ids, context={}):
+    def _get_facturae_invoice_txt_data(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}    
         facturae_datas = self._get_facturae_invoice_dict_data(
             cr, uid, ids, context=context)
         facturae_data_txt_lists = []
@@ -510,25 +536,28 @@ class account_invoice(osv.Model):
 
             invoice = self.browse(cr, uid, [facturae_data[
                                   'invoice_id']], context=context)[0]
-            pedimento_numeros = []
-            pedimento_fechas = []
-            pedimento_aduanas = []
-            for line in invoice.invoice_line:
-                try:
-                    pedimento_numeros.append(
-                        line.tracking_id.import_id.name or '')
-                    pedimento_fechas.append(
-                        line.tracking_id.import_id.date or '')
-                    pedimento_aduanas.append(
-                        line.tracking_id.import_id.customs or '')
-                except:
-                    pass
-            pedimento_numeros = ','.join(map(
-                lambda x: str(x) or '', pedimento_numeros))
-            pedimento_fechas = ','.join(map(
-                lambda x: str(x) or '', pedimento_fechas))
-            pedimento_aduanas = ','.join(map(
-                lambda x: str(x) or '', pedimento_aduanas))
+            pedimento_numeros = ''
+            pedimento_fechas = ''
+            pedimento_aduanas = ''
+            if 'tracking_id' in line._columns:
+                pedimento_numeros = []
+                pedimento_fechas = []
+                pedimento_aduanas = []
+                for line in invoice.invoice_line:
+                    import_id = line.tracking_id and line.tracking_id.import_id or False
+                    if import_id:
+                        pedimento_numeros.append(
+                            import_id.name or '')
+                        pedimento_fechas.append(
+                            import_id.date or '')
+                        pedimento_aduanas.append(
+                            import_id.customs or '')
+                pedimento_numeros = ','.join(map(
+                    lambda x: str(x) or '', pedimento_numeros))
+                pedimento_fechas = ','.join(map(
+                    lambda x: str(x) or '', pedimento_fechas))
+                pedimento_aduanas = ','.join(map(
+                    lambda x: str(x) or '', pedimento_aduanas))
 
             facturae_data_txt_list = [
                 invoice_comprobante_data['Receptor']['rfc'] or '',
@@ -565,7 +594,9 @@ class account_invoice(osv.Model):
             '%m%Y', time.strptime(fecha_promedio, '%Y-%m-%dT%H:%M:%S')) + '.txt'
         return cad, fname
 
-    def _get_folio(self, cr, uid, ids, context={}):
+    def _get_folio(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
         folio_data = {}
         id = ids and ids[0] or False
         if id:
@@ -645,7 +676,7 @@ class account_invoice(osv.Model):
                     'Not found a sequence of configuration. %s !') % (msg2))
         return folio_data
 
-    def _dict_iteritems_sort(self, data_dict):  # cr=False, uid=False, ids=[], context={}):
+    def _dict_iteritems_sort(self, data_dict):  # cr=False, uid=False, ids=[], context=None):
         """
         @param data_dict : Dictionary with data from invoice
         """
@@ -661,8 +692,10 @@ class account_invoice(osv.Model):
             if ko in keys:
                 key_item_sort.append([ko, data_dict[ko]])
                 keys.pop(keys.index(ko))
-        if keys == ['rfc', 'nombre', 'RegimenFiscal', 'DomicilioFiscal', 'ExpedidoEn']:
+        if keys == ['rfc', 'nombre', 'RegimenFiscal', 'DomicilioFiscal', 'ExpedidoEn'] or keys == ['rfc', 'nombre', 'RegimenFiscal', 'ExpedidoEn', 'DomicilioFiscal']:
             keys = ['rfc', 'nombre', 'DomicilioFiscal', 'ExpedidoEn', 'RegimenFiscal']
+        if keys ==['rfc', 'nombre', 'cfdi:RegimenFiscal', 'cfdi:DomicilioFiscal', 'cfdi:ExpedidoEn'] or keys == ['rfc', 'nombre', 'cfdi:RegimenFiscal', 'cfdi:ExpedidoEn', 'cfdi:DomicilioFiscal']:
+            keys = ['rfc', 'nombre', 'cfdi:DomicilioFiscal', 'cfdi:ExpedidoEn', 'cfdi:RegimenFiscal']
         for key_too in keys:
             key_item_sort.append([key_too, data_dict[key_too]])
         return key_item_sort
@@ -706,8 +739,8 @@ class account_invoice(osv.Model):
             doc.appendChild(node)
         return doc
 
-    def _get_facturae_invoice_xml_data(self, cr, uid, ids, context={}):
-        if not context:
+    def _get_facturae_invoice_xml_data(self, cr, uid, ids, context=None):
+        if context is None:
             context = {}
         data_dict = self._get_facturae_invoice_dict_data(
             cr, uid, ids, context=context)[0]
@@ -758,7 +791,7 @@ class account_invoice(osv.Model):
         nodeComprobante.setAttribute("sello", sign_str)
         data_dict['Comprobante']['sello'] = sign_str
 
-        noCertificado = self._get_noCertificado(context['fname_cer'])
+        noCertificado = self._get_noCertificado(cr, uid, ids, context['fname_cer'])
         if not noCertificado:
             raise osv.except_osv(_('Error in No. Certificate !'), _(
                 "Can't get the Certificate Number of the voucher.\nCkeck your configuration.\n%s") % (msg2))
@@ -781,22 +814,52 @@ class account_invoice(osv.Model):
             return doc_xml
         data_xml = doc_xml.toxml('UTF-8')
         data_xml = codecs.BOM_UTF8 + data_xml
-        fname_xml = (data_dict['Comprobante']['Emisor']['rfc'] or '') + '.' + (
-            data_dict['Comprobante'].get('serie', '') or '') + '.' + (
+        fname_xml = (data_dict['Comprobante']['Emisor']['rfc'] or '') + '_' + (
+            data_dict['Comprobante'].get('serie', '') or '') + '_' + (
             data_dict['Comprobante'].get('folio', '') or '') + '.xml'
-        data_xml = data_xml.replace(
-            '<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+        data_xml = data_xml.replace('<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="UTF-8"?>\n')
+        date_invoice = data_dict.get('Comprobante',{}) and datetime.strptime( data_dict.get('Comprobante',{}).get('fecha',{}), '%Y-%m-%dT%H:%M:%S').strftime('%Y-%m-%d') or False
+        facturae_version = '2.2'
+        if date_invoice  and date_invoice < '2012-07-01':
+            facturae_version = '2.0'
+        self.validate_scheme_facturae_xml(cr, uid, ids, [data_xml], facturae_version)
+        data_dict.get('Comprobante',{})
         return fname_xml, data_xml
 
-    def write_cfd_data(self, cr, uid, ids, cfd_datas, context={}):
+    def validate_scheme_facturae_xml(self, cr, uid, ids, datas_xmls=[], facturae_version = None, facturae_type="cfdv", scheme_type='xsd'):
+    #TODO: bzr add to file fname_schema
+        if not datas_xmls:
+            datas_xmls = []
+        certificate_lib = self.pool.get('facturae.certificate.library')
+        for data_xml in datas_xmls:
+            (fileno_data_xml, fname_data_xml) = tempfile.mkstemp('.xml', 'openerp_' + (False or '') + '__facturae__' )
+            f = open(fname_data_xml, 'wb')
+            f.write( data_xml )
+            f.close()
+            os.close(fileno_data_xml)
+            all_paths = tools.config["addons_path"].split(",")
+            for my_path in all_paths:
+                if os.path.isdir(os.path.join(my_path, 'l10n_mx_facturae', 'SAT')):
+                    # If dir is in path, save it on real_path
+                    fname_scheme = my_path and os.path.join(my_path, 'l10n_mx_facturae', 'SAT', facturae_type + facturae_version +  '.' + scheme_type) or ''
+                    #fname_scheme = os.path.join(tools.config["addons_path"], u'l10n_mx_facturae', u'SAT', facturae_type + facturae_version +  '.' + scheme_type )
+                    fname_out = certificate_lib.b64str_to_tempfile(cr, uid, ids, base64.encodestring(''), file_suffix='.txt', file_prefix='openerp__' + (False or '') + '__schema_validation_result__' )
+                    result = certificate_lib.check_xml_scheme(cr, uid, ids, fname_data_xml, fname_scheme, fname_out)
+                    if result: #Valida el xml mediante el archivo xsd
+                        raise osv.except_osv('Error al validar la estructura del xml!', 'Validación de XML versión %s:\n%s'%(facturae_version, result))
+        return True
+
+    def write_cfd_data(self, cr, uid, ids, cfd_datas, context=None):
         """
         @param cfd_datas : Dictionary with data that is used in facturae CFD and CFDI
         """
+        if context is None:
+            context = {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
         if not cfd_datas:
             cfd_datas = {}
         # obtener cfd_data con varios ids
         # for id in ids:
-        id = ids[0]
         if True:
             data = {}
             cfd_data = cfd_datas
@@ -812,25 +875,29 @@ class account_invoice(osv.Model):
                 'sello': sello,
                 'cadena_original': cadena_original,
             }
-            self.write(cr, uid, [id], data, context=context)
+            self.write(cr, uid, ids, data, context=context)
         return True
 
-    def _get_noCertificado(self, fname_cer, pem=True):
+    def _get_noCertificado(self, cr, uid, ids, fname_cer, pem=True, context=None):
         """
         @param fname_cer : Path more name of file created whit information 
                     of certificate with suffix .pem
         @param pem : Boolean that indicate if file is .pem
         """
+        if context is None:
+            context = {}
         certificate_lib = self.pool.get('facturae.certificate.library')
-        fname_serial = certificate_lib.b64str_to_tempfile(base64.encodestring(
+        fname_serial = certificate_lib.b64str_to_tempfile(cr, uid, ids, base64.encodestring(
             ''), file_suffix='.txt', file_prefix='openerp__' + (False or '') + \
             '__serial__')
-        result = certificate_lib._get_param_serial(
+        result = certificate_lib._get_param_serial(cr, uid, ids,
             fname_cer, fname_out=fname_serial, type='PEM')
         return result
 
-    def _get_sello(self, cr=False, uid=False, ids=False, context={}):
+    def _get_sello(self, cr=False, uid=False, ids=False, context=None):
         # TODO: Put encrypt date dynamic
+        if context is None:
+            context = {}
         fecha = context['fecha']
         year = float(time.strftime('%Y', time.strptime(
             fecha, '%Y-%m-%dT%H:%M:%S')))
@@ -839,20 +906,22 @@ class account_invoice(osv.Model):
         if year <= 2010:
             encrypt = "md5"
         certificate_lib = self.pool.get('facturae.certificate.library')
-        fname_sign = certificate_lib.b64str_to_tempfile(base64.encodestring(
+        fname_sign = certificate_lib.b64str_to_tempfile(cr, uid, ids, base64.encodestring(
             ''), file_suffix='.txt', file_prefix='openerp__' + (False or '') + \
             '__sign__')
-        result = certificate_lib._sign(fname=context['fname_xml'],
+        result = certificate_lib._sign(cr, uid, ids, fname=context['fname_xml'],
             fname_xslt=context['fname_xslt'], fname_key=context['fname_key'],
             fname_out=fname_sign, encrypt=encrypt, type_key='PEM')
         return result
 
-    def _xml2cad_orig(self, cr=False, uid=False, ids=False, context={}):
+    def _xml2cad_orig(self, cr=False, uid=False, ids=False, context=None):
+        if context is None:
+            context = {}
         certificate_lib = self.pool.get('facturae.certificate.library')
-        fname_tmp = certificate_lib.b64str_to_tempfile(base64.encodestring(
+        fname_tmp = certificate_lib.b64str_to_tempfile(cr, uid, ids, base64.encodestring(
             ''), file_suffix='.txt', file_prefix='openerp__' + (False or '') + \
             '__cadorig__')
-        cad_orig = certificate_lib._transform_xml(fname_xml=context['fname_xml'],
+        cad_orig = certificate_lib._transform_xml(cr, uid, ids, fname_xml=context['fname_xml'],
             fname_xslt=context['fname_xslt'], fname_out=fname_tmp)
         return fname_tmp, cad_orig
 
@@ -885,7 +954,9 @@ class account_invoice(osv.Model):
         open(fname_cadorig_digest, "w").write(cadorig_digest)
         return cadorig_digest, fname_cadorig_digest
 
-    def _get_facturae_invoice_dict_data(self, cr, uid, ids, context={}):
+    def _get_facturae_invoice_dict_data(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
         invoices = self.browse(cr, uid, ids, context=context)
         invoice_tax_obj = self.pool.get("account.invoice.tax")
         invoice_datas = []
@@ -1145,19 +1216,17 @@ class account_invoice(osv.Model):
                 invoice_data['Conceptos'].append({'Concepto': concepto})
 
                 pedimento = None
-                try:
-                    pedimento = line.tracking_id.import_id
-                except:
-                    pass
-                if pedimento:
-                    informacion_aduanera = {
-                        'numero': pedimento.name or '',
-                        'fecha': pedimento.date or '',
-                        'aduana': pedimento.customs,
-                    }
-                    concepto.update({
-                                    'InformacionAduanera': informacion_aduanera})
-            # Termina seccion: Conceptos
+                if 'tracking_id' in line._columns:
+                    pedimento = line.tracking_id and line.tracking_id.import_id or False
+                    if pedimento:
+                        informacion_aduanera = {
+                            'numero': pedimento.name or '',
+                            'fecha': pedimento.date or '',
+                            'aduana': pedimento.customs,
+                        }
+                        concepto.update({
+                                        'InformacionAduanera': informacion_aduanera})
+                # Termina seccion: Conceptos
             # Inicia seccion: impuestos
             invoice_data['Impuestos'] = {}
             invoice_data['Impuestos'].update({

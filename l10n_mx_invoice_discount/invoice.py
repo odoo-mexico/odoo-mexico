@@ -45,7 +45,9 @@ import decimal_precision as dp
 class account_invoice(osv.Model):
     _inherit = 'account.invoice'
 
-    def _get_facturae_invoice_dict_data(self, cr, uid, ids, context={}):
+    def _get_facturae_invoice_dict_data(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
         invoice_data_parents = super(account_invoice, self).\
         _get_facturae_invoice_dict_data(cr, uid, ids, context)
         invoice = self.browse(cr, uid, ids)[0]
@@ -53,27 +55,27 @@ class account_invoice(osv.Model):
         for line in invoice.invoice_line:
             sub_tot += line.price_unit * line.quantity
             invoice_data_parents[0]['Comprobante']['Conceptos'][
-                invoice.invoice_line.index(line)]['Concepto'][
-                'cantidad'] = line.quantity or '0.0'
-            invoice_data_parents[0]['Comprobante']['Conceptos'][
-                invoice.invoice_line.index(line)]['Concepto'][
-                'descripcion'] = line.name or ' '
-            invoice_data_parents[0]['Comprobante']['Conceptos'][
-                invoice.invoice_line.index(line)]['Concepto'][
-                'importe'] = line.price_unit * line.quantity or '0'
-            invoice_data_parents[0]['Comprobante']['Conceptos'][
-                invoice.invoice_line.index(line)]['Concepto'][
-                'noIdentificacion'] = line.product_id.default_code or '-'
-            invoice_data_parents[0]['Comprobante']['Conceptos'][
-                invoice.invoice_line.index(line)]['Concepto'][
-                'unidad'] = line.uos_id and line.uos_id.name or ''
-            invoice_data_parents[0]['Comprobante']['Conceptos'][
-                invoice.invoice_line.index(line)]['Concepto'][
-                'valorUnitario'] = line.price_unit or '0'
+                invoice.invoice_line.index(line)]['Concepto']\
+                ['cantidad'] = line.quantity or '0.0'
+            invoice_data_parents[0]['Comprobante']['Conceptos']\
+                [invoice.invoice_line.index(line)]['Concepto']\
+                ['descripcion'] = line.name or ' '
+            invoice_data_parents[0]['Comprobante']['Conceptos']\
+                [invoice.invoice_line.index(line)]['Concepto']\
+                ['importe'] = line.price_unit * line.quantity or '0'
+            invoice_data_parents[0]['Comprobante']['Conceptos']\
+                [invoice.invoice_line.index(line)]['Concepto']\
+                ['noIdentificacion'] = line.product_id.default_code or '-'
+            invoice_data_parents[0]['Comprobante']['Conceptos']\
+                [invoice.invoice_line.index(line)]['Concepto']\
+                ['unidad'] = line.uos_id and line.uos_id.name or ''
+            invoice_data_parents[0]['Comprobante']['Conceptos']\
+                [invoice.invoice_line.index(line)]['Concepto']\
+                ['valorUnitario'] = line.price_unit or '0'
 
         invoice_data_parents[0]['Comprobante'][
             'motivoDescuento'] = invoice.motive_discount or ''
-        invoice_data_parents[0]['Comprobante']['descuento'] = invoice. \
+        invoice_data_parents[0]['Comprobante']['descuento'] = invoice.\
             global_discount_amount and '%.3f' % invoice.global_discount_amount or '0'
         invoice_data_parents[0]['Comprobante']['subTotal'] = sub_tot
         return invoice_data_parents
@@ -94,6 +96,8 @@ class account_invoice(osv.Model):
                 cr, uid, inv, compute_taxes, ait_obj)
 
     def button_reset_taxes(self, cr, uid, ids, context=None):
+        if context is None:
+            context = {}
         invoice = self.browse(cr, uid, ids)[0]
         invoice_line_obj = self.pool.get('account.invoice.line')
         sub_tot = 0
@@ -102,7 +106,7 @@ class account_invoice(osv.Model):
                 'discount': invoice.global_discount_percent,
             }
             sub_tot += line.price_unit * line.quantity
-            invoice_line_obj.write(cr, uid, line.id, discount_dic)
+            invoice_line_obj.write(cr, uid, [line.id], discount_dic)
 
         discount = invoice.global_discount_percent and sub_tot * (
             invoice.global_discount_percent and invoice.\

@@ -25,26 +25,31 @@
 ##############################################################################
 
 from openerp.osv import osv, fields
+from openerp import SUPERUSER_ID
 
 class res_company(osv.Model):
     _inherit = 'res.company'
     
     def _get_address_data(self, cr, uid, ids, field_names, arg, context=None):
         """ Read the 'address' functional fields. """
+        if context is None:
+            context = {}
         result = {}
         part_obj = self.pool.get('res.partner')
         for company in self.browse(cr, uid, ids, context=context):
             result[company.id] = {}.fromkeys(field_names, False)
             if company.partner_id:
-                address_data = part_obj.address_get(cr, openerp.SUPERUSER_ID, [company.partner_id.id], adr_pref=['default'])
+                address_data = part_obj.address_get(cr, SUPERUSER_ID, [company.partner_id.id], adr_pref=['default'])
                 if address_data['default']:
-                    address = part_obj.read(cr, openerp.SUPERUSER_ID, address_data['default'], field_names, context=context)
+                    address = part_obj.read(cr, SUPERUSER_ID, address_data['default'], field_names, context=context)
                     for field in field_names:
                         result[company.id][field] = address[field] or False
         return result
 
     def _set_address_data(self, cr, uid, company_id, name, value, arg, context=None):
         """ Write the 'address' functional fields. """
+        if context is None:
+            context = {}
         company = self.browse(cr, uid, company_id, context=context)
         if company.partner_id:
             part_obj = self.pool.get('res.partner')

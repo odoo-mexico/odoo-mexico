@@ -35,6 +35,8 @@ class l10n_mx_email_config_settings(osv.TransientModel):
     }
 
     def get_default_email_tmp_id(self, cr, uid, fields, context=None):
+        if context is None:
+            context = {}
         email_tmp_id = False
         cr.execute(
             """ select max(id) as email_tmp_id from l10n_mx_email_config_settings """)
@@ -45,8 +47,8 @@ class l10n_mx_email_config_settings(osv.TransientModel):
         else:
             try:
                 email_tmp_id = self.pool.get('ir.model.data').get_object(cr,
-                    uid, 'l10n_mx_ir_attachment_facturae',
-                    'email_template_template_facturae_mx')
+                                                                         uid, 'l10n_mx_ir_attachment_facturae',
+                                                                         'email_template_template_facturae_mx')
             except:
                 pass
         return {'email_tmp_id': email_tmp_id and email_tmp_id.id or False}

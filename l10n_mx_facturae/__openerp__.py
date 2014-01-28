@@ -30,8 +30,8 @@
     "version" : "1.0",
     "author" : "Vauxoo",
     "category" : "Localization/Mexico",
-    "description" : """This module creates e-invoice files from invoices with \
-    standard CFD-2010 of Mexican SAT.
+    "description" : """This module creates e-invoice files from \
+    invoices with standard CFD-2010 of Mexican SAT.
 Requires the following programs:
   xsltproc
     Ubuntu insall with:
@@ -40,11 +40,16 @@ Requires the following programs:
   openssl
       Ubuntu insall with:
         sudo apt-get install openssl
+
+  xmlstarlet
+      Ubuntu insall with:
+        sudo apt-get install xmlstarlet
     """,
     "website" : "http://www.vauxoo.com/",
     "license" : "AGPL-3",
-    "depends" : ["account", "base_vat", "document",
-            "l10n_mx_facturae_lib", #"l10n_mx_partner_address",
+    "depends" : [ "l10n_mx_facturae_groups", "account", "base_vat", 
+            "document",
+            "l10n_mx_facturae_lib",
             "l10n_mx_facturae_cer",
             "l10n_mx_invoice_datetime",
             "l10n_mx_account_tax_category",
@@ -61,21 +66,24 @@ Requires the following programs:
             "l10n_mx_invoice_currency_chgdft",
             "l10n_mx_base_vat_split",
             "l10n_mx_facturae_report",
-
+            "l10n_mx_facturae_group_show_wizards",
+            "l10n_mx_settings_facturae",
         ],
-    "init_xml" : [],
-    "demo_xml" : ["demo/l10n_mx_facturae_seq_demo.xml",],
-    "update_xml" : [
-        'security/l10n_mx_facturae_security.xml',
+    "demo" : [
+        "demo/l10n_mx_facturae_seq_demo.xml",
+        "demo/account_invoice_cfd_demo.xml",
+    ],
+    "data" : [
+        #'security/l10n_mx_facturae_security.xml',
         #'security/ir.model.access.csv',
-        "l10n_mx_facturae_report.xml",
+        #"l10n_mx_facturae_report.xml",
         "wizard/wizard_invoice_facturae_txt_v6_view.xml",
         "wizard/wizard_invoice_facturae_xml_v6_view.xml",
         "wizard/installer_view.xml",
-        #"ir_sequence_view.xml",
-        #"res_company_view6.xml",
-        "invoice_view.xml",
-        #"partner_address_view.xml",
+        #"invoice_view.xml",
+    ],
+    "test" : [
+        "test/account_invoice_cfd.yml",
     ],
     "installable" : True,
     "active" : False,

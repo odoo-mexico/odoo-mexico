@@ -30,12 +30,18 @@
     """,
     "website" : "http://www.vauxoo.com/",
     "license" : "AGPL-3",
-    "depends" : ["account", "mail", "email_template"
+    "depends" : ["account", "mail", "email_template",
+                "l10n_mx_facturae_seq",
+                "l10n_mx_facturae_report",
+                "email_template_multicompany",
+                "l10n_mx_facturae_groups",
+                "account_cancel",
+                "l10n_mx_facturae_lib",
         ],
-    "init_xml" : [],
-    "demo_xml" : ["demo/l10n_mx_facturae_email_demo.xml",
+    "demo" : ["demo/l10n_mx_facturae_email_demo.xml",
     ],
-    "update_xml" : [
+    "data" : [
+        "security/l10n_mx_ir_attachment_facturae_security.xml",
         "security/ir.model.access.csv",
         "ir_attachment_facturae_view.xml",
         "l10n_mx_facturae_workflow.xml",

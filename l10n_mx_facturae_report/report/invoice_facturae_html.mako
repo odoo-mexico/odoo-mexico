@@ -1,3 +1,4 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <html>
 <head>
     <style type="text/css">
@@ -7,13 +8,13 @@
 <body>
     %for o in objects :
         ${set_global_data(o)}
-        <table>
+        <table class="basic_table">
             <tr>
                 <td style="vertical-align: top;">
                     ${helper.embed_image('jpeg',str(o.company_emitter_id.logo),180, 85)}
                 </td>
                 <td>
-                    <table>
+                    <table class="basic_table">
                         <tr>
                             <td width='50%'>
                                 <div class="title">${o.company_emitter_id.address_invoice_parent_company_id.name or ''|entity}</div>
@@ -51,7 +52,7 @@
                                             ${address_emitter.l10n_mx_street4 or ''|entity}
                                             ${address_emitter.street2 or ''|entity}
                                             ${address_emitter.zip or ''|entity}
-                                            <br />${_("Localidad:")} ${address_emitter.l10n_mx_city2 or ''|entity}
+                                            <br/>${_("Localidad:")} ${address_emitter.l10n_mx_city2 or ''|entity}
                                             <br/>${address_emitter.city or ''|entity}
                                             , ${address_emitter.state_id and address_emitter.state_id.name or ''|entity}
                                             , ${address_emitter.country_id and address_emitter.country_id.name or ''|entity}
@@ -59,7 +60,7 @@
                                             %if o.company_emitter_id.partner_id.regimen_fiscal_id:
                                                 <br/>${ o.company_emitter_id.partner_id.regimen_fiscal_id.name or ''|entity }
                                             %endif
-                                            <br/>${address_emitter.phone and _("Teléfono(s):") or address_emitter.fax and _("Teléfono(s):") or address_emitter.mobile and _("Teléfono(s):") or ''|entity}
+                                            <br/>${_("Tel&eacute;fono(s):")}
                                             ${address_emitter.phone or ''|entity}
                                             ${address_emitter.fax  and ',' or ''|entity} ${address_emitter.fax or ''|entity}
                                             ${address_emitter.mobile and ',' or ''|entity} ${address_emitter.mobile or ''|entity}
@@ -163,10 +164,10 @@
                         ${o.address_issued_id.country_id and o.address_issued_id.country_id.name or ''|entity}
                     %endif
                     <br/>${_("a")} ${o.date_invoice_tz or ''|entity}
-                    %if o.invoice_sequence_id.approval_id.type != 'cbb':
-                        ${_("Serie:")} ${get_approval() and get_approval().serie or _("Sin serie")|entity}
-                        <br/>${_("Aprobación:")} ${get_approval() and get_approval().approval_number or _("Sin aprobación")|entity}
-                        <br/>${_("Año Aprobación:")} ${get_approval() and get_approval().approval_year or _("No válido")|entity}
+                    %if o.invoice_sequence_id.approval_id and o.invoice_sequence_id.approval_id.type != 'cbb':
+                        ${_("Serie:")} ${o.invoice_sequence_id.approval_id.serie or _("Sin serie")|entity}
+                        <br/>${_("Aprobaci&oacute;n:")} ${o.invoice_sequence_id.approval_id.approval_number or _("Sin aprobaci&oacute;n")|entity}
+                        <br/>${_("A&ntilde;o Aprobaci&oacute;n:")} ${o.invoice_sequence_id.approval_id.approval_year or _("No v&aacute;lido")|entity}
                     %endif
                 </td>
             </tr>
@@ -176,7 +177,7 @@
             <tr class="firstrow">
                 <th width="10%">${_("Cant.")}</th>
                 <th width="10%">${_("Unidad")}</th>
-                <th>${_("Descripción")}</th>
+                <th>${_("Descripci&oacute;n")}</th>
                 <th width="9%" >${_("P.Unitario")}</th>
                 %if has_disc(o.invoice_line):
                     <th width="8%" >${_("Dto. %") or ''}</th>
@@ -240,19 +241,20 @@
             </tr>
             <tr>
                 <td class="center_td">
-                    ${_('PAGO EN UNA SOLA EXHIBICIÓN - EFECTOS FISCALES AL PAGO')}
+                    ${_('PAGO EN UNA SOLA EXHIBICI&Oacute;N - EFECTOS FISCALES AL PAGO')}
                 </td>
             </tr>
             
         </table>
+        <br/>${o.comment or '' |entity}<br/>
         <br clear="all"/>
         <!--code for cfd-->
-        %if o.invoice_sequence_id.approval_id.type == 'cfd22':
-            ${_('“Este documento es una representacion impresa de un CFD”')}<br/>
-            ${_('CFD, Comprobante Fiscal Digital')}
-        %elif o.invoice_sequence_id.approval_id.type == 'cfdi32':
-            <font class="font">“Este documento es una representacion impresa de un CFDI”
+        %if 'cfdi' in o.invoice_sequence_id.approval_id.type:
+            <font class="font">“Este documento es una representación impresa de un CFDI”
             <br/>CFDI, Comprobante Fiscal Digital por Internet</font>
+        %elif 'cfd' in o.invoice_sequence_id.approval_id.type:
+            ${_('&quot;Este documento es una representaci&oacute;n impresa de un CFD&quot;')}<br/>
+            ${_('CFD, Comprobante Fiscal Digital')}
         %endif
         <!-- bank info-->
         %if o.company_emitter_id.partner_id.bank_ids:
@@ -266,7 +268,7 @@
             <table class="basic_table" rules="all">
                 <tr>
                     <td class="data_bank_label">${_('Banco / Moneda')}</td>
-                    <td class="data_bank_label">${_('Número de cuenta')}</td>
+                    <td class="data_bank_label">${_('N&uacute;mero de cuenta')}</td>
                     <td class="data_bank_label" width="30%">${_('Clave Interbancaria Estandarizada (CLABE)')}</td>
                     <td class="data_bank_label">${_('Referencia')}</td>
                 </tr>
@@ -280,11 +282,8 @@
                 %endfor
             </table>
         %endif
-        <table class="basic_table">
-            <tr><td class="center_td">${ o.company_emitter_id.promissory or ''|entity }</td></tr>
-        </table>
         <!--code for cfd 3.2-->
-        %if o.invoice_sequence_id.approval_id.type == 'cfdi32':
+        %if 'cfdi' in o.invoice_sequence_id.approval_id.type:
             <table class="basic_table" rules="cols" style="border:1.5px solid grey;">
                 <tr>
                     <th width="33%"> ${_('Certificado del SAT')}</th>
@@ -303,8 +302,8 @@
             <table class="basic_table" rules="cols" style="border:1.5px solid grey;">
                 <tr>
                     <th width="33%">${_('Certificado del emisor')}</th>
-                    <th width="34%">${_('Método de Pago')}</th>
-                    <th width="33%">${_('Últimos 4 dígitos de la cuenta bancaria')}</th>
+                    <th width="34%">${_('M&eacute;todo de Pago')}</th>
+                    <th width="33%">${_('&Uacute;ltimos 4 d&iacute;gitos de la cuenta bancaria')}</th>
                 </tr>
                 <tr>
                     <td class="center_td">${ o.no_certificado or 'No identificado'|entity }</td>
@@ -316,35 +315,33 @@
             </table>
         %endif
         <!--code for cbb-->
-        %if o.invoice_sequence_id.approval_id.type == 'cbb':
-            %if get_approval():
-                <%cbb_approval_row = get_approval()%>
-                <table class="basic_table" style="page-break-inside:avoid; border:1.5px solid grey;">
-                    <tr>
-                        <td width="20%" valign="top">
-                            %if ( o.type  in ['out_invoice', 'out_refund'] ) and ( o.state in ['open', 'paid', 'cancel'] ):
-                                ${helper.embed_image('jpeg',str(o.invoice_sequence_id.approval_id.cbb_image),180, 180)}
-                            %else:
-                                <p> ${_('SIN FOLIO O ESTATUS NO VALIDO')}
-                            %endif
-                        </td>
-                        <td valign="top" class="tax_td" style="padding-top:3px;">
-                            %if ( o.type  in ['out_invoice', 'out_refund'] ) and ( o.state in ['open', 'paid', 'cancel'] ):
-                                Número de aprobación SICOFI: ${o.invoice_sequence_id.approval_id.approval_number or '' |entity}<br/>
-                            %else:
-                                <p> ${_('SIN FOLIO O ESTATUS NO VALIDO')}</br>
-                            %endif
-                            La reproducción apócrifa de este comprobante constituye un delito en los términos de las disposiciones fiscales.<br/>
-                            Este comprobante tendrá una vigencia de dos años contados a partir de la fecha aprobación de la asignación de folios, la cual es: ${o.invoice_sequence_id.approval_id.date_start or '' |entity}
-                        </td>
-                        <td width="15%" valign="top">
-                            ${helper.embed_image('jpeg',str(o.company_emitter_id.cif_file),140, 220)}
-                        </td>
-                    </tr>
-                </table>
-            %else:
-                <p> ${_('La aprobación CBB no pudo ser obtenida, por favor contacte a su administrador')}
-            %endif
+        %if o.invoice_sequence_id.approval_id and o.invoice_sequence_id.approval_id.type == 'cbb':
+            <table class="basic_table" style="page-break-inside:avoid; border:1.5px solid grey;">
+                <tr>
+                    <td width="20%" valign="top">
+                        %if ( o.type  in ['out_invoice', 'out_refund'] ) and ( o.state in ['open', 'paid', 'cancel'] ):
+                            ${helper.embed_image('jpeg',str(o.invoice_sequence_id.approval_id.cbb_image),180, 180)}
+                        %else:
+                            <p> ${_('SIN FOLIO O ESTATUS NO VALIDO')}
+                        %endif
+                    </td>
+                    <td valign="top" class="tax_td" style="padding-top:3px;">
+                        %if ( o.type  in ['out_invoice', 'out_refund'] ) and ( o.state in ['open', 'paid', 'cancel'] ):
+                            Número de aprobación SICOFI: ${o.invoice_sequence_id.approval_id.approval_number or '' |entity}<br/>
+                        %else:
+                            <p> ${_('SIN FOLIO O ESTATUS NO VALIDO')}</br>
+                        %endif
+                        La reproducción apócrifa de este comprobante constituye un delito en los términos de las disposiciones fiscales.<br/>
+                        Este comprobante tendrá una vigencia de dos años contados a partir de la fecha aprobación de la asignación de folios, la cual es: ${o.invoice_sequence_id.approval_id.date_start or '' |entity}
+                    </td>
+                    <td width="15%" valign="top">
+                        ${helper.embed_image('jpeg',str(o.company_emitter_id.cif_file),140, 220)}
+                    </td>
+                </tr>
+            </table>
+        <!--%else:
+            <p> ${_('La aprobaci&oacute;n CBB no pudo ser obtenida, por favor contacte a su administrador')}
+        -->
         %endif
         <!--code for cfd22-->
         %if o.invoice_sequence_id.approval_id.type == 'cfd22':
@@ -367,10 +364,9 @@
             </div>
         %endif
         <!--code for cfd32-->
-        %if o.invoice_sequence_id.approval_id.type == 'cfdi32':
+        %if 'cfdi' in o.invoice_sequence_id.approval_id.type:
             <div style="page-break-inside:avoid; border:1.5px solid grey;">
                 <table width="100%" class="datos_fiscales">
-                    <%data_certificate=get_data_certificate(o.id)%>
                     <tr>
                         %if o.company_emitter_id.cif_file:
                         <td align="left">
@@ -394,7 +390,7 @@
                             <b>${_('Cadena original:')} </b><br/>
                             ${split_string(o.cfdi_cadena_original) or ''|entity}</br>
                             <b>${_('Enlace al certificado: ')}</b></br>
-                            ${data_certificate['certificate_link'] or ''|entity}</p>
+                            ${o.pac_id and o.pac_id.certificate_link or ''|entity}</p>
                         </td>
                         %if o.cfdi_cbb:
                         <td align="right">
@@ -403,15 +399,22 @@
                         %endif
                     </tr>
                 </table>
-                <!--</span> si se activan, forzan un brinco de linea
-            </div>-->
+                <!--</span> si se activan, forzan un brinco de linea-->
+            </div>
         %endif
         %if not o.invoice_sequence_id.approval_id.type:
             <hr>
-            ${_('No se encontró la aprobación')}
+            ${_('No se encontr&oacute; la aprobaci&oacute;n')}
             <hr>
         %endif
-                                 
+        <br></br>
+        <section>
+            %if o.company_id.dinamic_text:
+                <table class="basic_table" style="border:1.5px solid grey;">
+                    <tr><td class="address"><pre style='pre'>${ get_text_promissory(o.company_id, o.partner_id, address_emitter, o) or ''|entity }</pre></td></tr>
+                </table>
+            %endif
+        </section>
     <p style="page-break-after:always"></p>
     %endfor
 

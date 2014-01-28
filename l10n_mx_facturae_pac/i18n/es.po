@@ -1,75 +1,83 @@
-# Translation of OpenERP Server.
-# This file contains the translation of the following modules:
-#	* l10n_mx_facturae_pac
+# Spanish translation for openerp-mexico-localization
+# Copyright (c) 2013 Rosetta Contributors and Canonical Ltd 2013
+# This file is distributed under the same license as the openerp-mexico-localization package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenERP Server 7.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-22 23:21+0000\n"
-"PO-Revision-Date: 2013-04-22 23:21+0000\n"
-"Last-Translator: <>\n"
-"Language-Team: \n"
+"Project-Id-Version: openerp-mexico-localization\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2013-11-08 03:15+0000\n"
+"PO-Revision-Date: 2013-11-13 06:11+0000\n"
+"Last-Translator: Federico Manuel Echeverri Choux <echeverrifm@gmail.com>\n"
+"Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2014-01-22 06:15+0000\n"
+"X-Generator: Launchpad (build 16901)\n"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:128
+#: code:addons/l10n_mx_facturae_pac/invoice.py:158
 #, python-format
-msgid "Can't get the string original of the voucher.\n"
+msgid ""
+"Can't get the string original of the voucher.\n"
 "Ckeck your configuration.\n"
 "%s"
-msgstr "No se pudo obtener la cadena original del comprobante.\n"
-"Verifique su configuracion.\n"
-"%s"
+msgstr ""
+"No se puede obtener la cadena original del comprobante.\n"
+"Revise su configuración.\n"
+"% s"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:150
-#, python-format
-msgid "Error in Certificate!"
-msgstr "Error en el Certificado!"
-
-#. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:136
+#: code:addons/l10n_mx_facturae_pac/invoice.py:168
 #, python-format
 msgid "Error in Stamp !"
-msgstr "Error en Sello !"
+msgstr "Error en el sello!"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:144
+#: code:addons/l10n_mx_facturae_pac/invoice.py:177
 #, python-format
 msgid "Error in No. Certificate !"
-msgstr "Error en No. de Certificado !"
+msgstr "Error en el N° de certificado"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:131
+#: code:addons/l10n_mx_facturae_pac/invoice.py:162
 #, python-format
-msgid "Can't get the folio of the voucher.\n"
+msgid ""
+"Can't get the folio of the voucher.\n"
 "Before generating the XML, click on the button, generate invoice.\n"
 "Ckeck your configuration.\n"
 "%s"
-msgstr "No se pudo obtener el Folio del comprobante.\n"
-"Antes de generar el XML, de clic en el boton, generar factura.\n"
-"Verifique su configuracion.\n"
-"%s"
+msgstr ""
+"No se puede obtener el folio del comprobante.\n"
+"Antes de generar el XML, haga clic en el botón, generar factura.\n"
+"Revise su configuración.\n"
+"% s"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:136
+#: code:addons/l10n_mx_facturae_pac/invoice.py:168
 #, python-format
-msgid "Can't generate the stamp of the voucher.\n"
+msgid ""
+"Can't generate the stamp of the voucher.\n"
 "Ckeck your configuration.\n"
 "s%s"
-msgstr "No se pudo generar el sello del comprobante.\n"
-"Verifique su configuracion.\n"
-"s%s"
+msgstr ""
+"No se puede generar el sello del comprobante.\n"
+"Revise su configuración.\n"
+"s% s"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:128
+#: code:addons/l10n_mx_facturae_pac/invoice.py:157
 #, python-format
 msgid "Error in Original String!"
-msgstr "Error Cadena Original!"
+msgstr "Error en la cadena Original"
+
+#. module: l10n_mx_facturae_pac
+#: code:addons/l10n_mx_facturae_pac/invoice.py:184
+#, python-format
+msgid "Error in Certificate!"
+msgstr "Error en el certificado"
 
 #. module: l10n_mx_facturae_pac
 #: model:ir.model,name:l10n_mx_facturae_pac.model_account_invoice
@@ -77,28 +85,20 @@ msgid "Invoice"
 msgstr "Factura"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:150
+#: code:addons/l10n_mx_facturae_pac/invoice.py:177
+#: code:addons/l10n_mx_facturae_pac/invoice.py:184
 #, python-format
-msgid "Can't get the Certificate Number of the voucher.\n"
+msgid ""
+"Can't get the Certificate Number of the voucher.\n"
 "Ckeck your configuration.\n"
 "%s"
-msgstr "No se pudo obtener el No de Certificado del comprobante.\n"
-"Verifique su configuracion.\n"
-"%s"
+msgstr ""
+"No se puede obtener el Número de Certificado del comprobante\n"
+"Revise su configuración.\n"
+"% s"
 
 #. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:131
+#: code:addons/l10n_mx_facturae_pac/invoice.py:161
 #, python-format
 msgid "Error in Folio!"
-msgstr "Error en el Folio!"
-
-#. module: l10n_mx_facturae_pac
-#: code:addons/l10n_mx_facturae_pac/invoice.py:144
-#, python-format
-msgid "Can't get the Certificate Number of the voucher.\n"
-"Ckeck your configuration.\n"
-"%s"
-msgstr "No se pudo obtener el No de Certificado del comprobante.\n"
-"Verifique su configuracion.\n"
-"%s"
-
+msgstr "Error en Folio"
