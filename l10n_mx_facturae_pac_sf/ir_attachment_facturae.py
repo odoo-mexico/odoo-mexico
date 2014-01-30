@@ -148,8 +148,8 @@ class ir_attachment_facturae_mx(osv.Model):
                     has completed correctly.\n- The uuid cancelled is:\
                     ') + folio_cancel
                     invoice_obj.write(cr, uid, [invoice.id], {
-                        'cfdi_fecha_cancelacion': time.strftime(
-                        '%Y-%m-%d %H:%M:%S')
+                        'cfdi_fecha_cancelacion': time.strftime('%Y-%m-%d %H:%M:%S'),
+                        'pac_id' : pac_params_id or False
                     })
                     status = True
                 else:
@@ -169,8 +169,7 @@ class ir_attachment_facturae_mx(osv.Model):
         pac_params_obj = invoice_obj.pool.get('params.pac')
         for ir_attachment_facturae_mx_id in self.browse(cr, uid, ids, context=context):
             invoice = ir_attachment_facturae_mx_id.invoice_id
-            comprobante = invoice_obj._get_type_sequence(
-                cr, uid, [invoice.id], context=context)
+            comprobante = invoice_obj._get_type_sequence(cr, uid, [invoice.id], context=context)
             cfd_data = base64.decodestring(fdata or invoice_obj.fdata)
             xml_res_str = xml.dom.minidom.parseString(cfd_data)
             xml_res_addenda = invoice_obj.add_addenta_xml(
