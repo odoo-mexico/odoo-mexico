@@ -32,7 +32,7 @@
                 "l10n_mx_company_multi_address",
                 "l10n_mx_diot_report",
                 "l10n_mx_facturae",
-                "l10n_mx_facturae_cbb",
+                #"l10n_mx_facturae_cbb",#Now deprecated by sat
                 "l10n_mx_facturae_cer",
                 "l10n_mx_facturae_groups",
                 "l10n_mx_facturae_group_show_wizards",

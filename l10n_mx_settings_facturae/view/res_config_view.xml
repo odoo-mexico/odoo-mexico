@@ -19,10 +19,11 @@
                                 <field name="module_l10n_mx_facturae" class="oe_inline"/>
                                 <label for="module_l10n_mx_facturae"/>
                             </div>
+                            <!--
                             <div>
                                 <field name="module_l10n_mx_facturae_cbb" class="oe_inline"/>
                                 <label for="module_l10n_mx_facturae_cbb"/>
-                            </div>
+                            </div>-->
                             <div>
                                 <field name="module_l10n_mx_facturae_pac_sf" class="oe_inline"/>
                                 <label for="module_l10n_mx_facturae_pac_sf"/>
