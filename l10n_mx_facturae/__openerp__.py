@@ -47,6 +47,7 @@ Requires the following programs:
     """,
     "website" : "http://www.vauxoo.com/",
     "license" : "AGPL-3",
+    
     "depends" : [ "l10n_mx_facturae_groups", "account", "base_vat", 
             "document",
             "l10n_mx_facturae_lib",
