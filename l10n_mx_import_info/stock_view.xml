@@ -29,7 +29,7 @@
                 </form>
             </field>
         </record>
-        <record model="ir.ui.view" id="stock_tracking_form">
+        <record model="ir.ui.view" id="stock_report_tracking_form">
             <field name="name">stock.report.tracklots.form</field>
             <field name="model">stock.report.tracklots</field>
             <field name="arch" type="xml">
