@@ -144,7 +144,7 @@
                 "process",
                 "sale_stock",
                 "account_voucher",
-                "crm_partner_assign",
+                #"crm_partner_assign",#Make a error of geolocalization: https://bugs.launchpad.net/openobject-addons/+bug/1295545
                 "hr_timesheet_invoice",
                 "l10n_hn",
                 "marketing_campaign_crm_demo",
