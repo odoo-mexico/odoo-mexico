@@ -14,11 +14,13 @@ install:
   - git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly ${VERSION}
+  - sudo apt-get install openssl xlstproc
 
 script:
   - travis_run_flake8
   - travis_run_pylint
   - travis_run_tests ${VERSION}
+  - git clone https://github.com/vauxoo/addons-vauxoo ${HOME}/addons-vauxoo -b ${VERSION}
 
 after_success:
   coveralls
