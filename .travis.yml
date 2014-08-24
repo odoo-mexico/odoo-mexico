@@ -18,10 +18,10 @@ install:
   #- sudo apt-get install openssl# openssl package is installed on travis and show a error
 
 script:
+  - git clone https://github.com/vauxoo/addons-vauxoo ${HOME}/addons-vauxoo -b ${VERSION}
   - travis_run_flake8
   - travis_run_pylint
   - travis_run_tests ${VERSION}
-  - git clone https://github.com/vauxoo/addons-vauxoo ${HOME}/addons-vauxoo -b ${VERSION}
 
 after_success:
   coveralls
