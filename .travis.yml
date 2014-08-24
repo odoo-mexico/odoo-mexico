@@ -14,7 +14,8 @@ install:
   - git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly ${VERSION}
-  - sudo apt-get install python-soappy xsltproc openssl xmlstarlet #l10n_mx packages
+  - sudo apt-get install python-soappy xsltproc xmlstarlet #l10n_mx packages
+  #- sudo apt-get install openssl# openssl package is installed on travis and show a error
 
 script:
   - travis_run_flake8
