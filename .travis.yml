@@ -14,6 +14,8 @@ install:
   #- git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${HOME}/odoo-mexico/odoo-mexico/travis:${PATH}
   #- travis_install_nightly ${VERSION}
+  - ls -Rt ${HOME}
+  - ls -Rt .
   - travis_install_mx_nightly ${VERSION}
 
 script:
