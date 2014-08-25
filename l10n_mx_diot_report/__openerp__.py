@@ -54,6 +54,7 @@
         "account_voucher_tax",
         "account_voucher",
         "l10n_mx_partner_address",
+        "l10n_mx_ir_attachment_facturae",
         ],
     "demo" : ["demo/account_voucher_tax_demo.xml",
               "demo/res_partner_demo.xml",
