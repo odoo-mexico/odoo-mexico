@@ -14,7 +14,7 @@ install:
   - git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly ${VERSION}
-  - sudo apt-get install xsltproc xmlstarlet #l10n_mx packages
+  - sudo apt-get install xsltproc xmlstarlet wkhtmltopdf #l10n_mx packages
   - sudo pip install SOAPpy #l10n_mx packages
   - sudo pip install PyWebDAV #Default package required of odoo
   - sudo pip install recaptcha-client egenix-mx-base #Required to import addons-vauxoo
