@@ -18,3 +18,4 @@ wget -O /tmp/webkit_patched/wkhtmltopdf.tar.bz2 https://wkhtmltopdf.googlecode.c
 bzip2 -dc /tmp/webkit_patched/wkhtmltopdf.tar.bz2 | tar -xvO >/tmp/webkit_patched/webkit-patched
 sudo cp /tmp/webkit_patched/webkit-patched /usr/bin/wkhtmltopdf
 
+exit 1
