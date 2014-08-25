@@ -12,9 +12,9 @@ virtualenv:
 
 install:
   - git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
-  - export PATH=${HOME}/maintainer-quality-tools/travis:${HOME}/odoo-mexico/odoo-mexico/travis:${PATH}
+  - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly ${VERSION}
-  - ${TRAVIS_BUILD_DIR}/travis_install_mx_nightly ${VERSION}
+  - ${TRAVIS_BUILD_DIR}/travis/travis_install_mx_nightly ${VERSION}
 
 script:
   - git clone https://github.com/vauxoo/addons-vauxoo ${HOME}/addons-vauxoo -b ${VERSION}
