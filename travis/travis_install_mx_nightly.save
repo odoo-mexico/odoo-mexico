@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#apt mx packages
+sudo apt-get install xsltproc xmlstarlet wkhtmltopdf
+#sudo apt-get install openssl #package openssl installed on travis and show a error
+
+#pip mx packages
+sudo pip install SOAPpy #l10n_mx packages
+
+#pip addons-vauxoo packages #FIXME: This modules make error use or not use it
+sudo pip install recaptcha-client egenix-mx-base
+
+#pip odoo default package #FIXME: This package should be within the main script 
+sudo pip install PyWebDAV #Default package required of odoo
+
+#webkit patched process
+mkdir -p /tmp/webkit_patched
+wget -O /tmp/webkit_patched/wkhtmltopdf-0.11.0_rc1-static-amd64.tar.bz2 https://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.11.0_rc1-static-amd64.tar.bz2
+bzip2 -dc wkhtmltopdf-0.11.0_rc1-static-amd64.tar.bz2 | tar -xv
+sudo cp wkhtmltopdf-amd64 /usr/bin/wkhtmltopdf
+

@@ -12,19 +12,12 @@ virtualenv:
 
 install:
   - git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
-  - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
+  - export PATH=${HOME}/maintainer-quality-tools/travis:${HOME}/travis:${PATH}
   - travis_install_nightly ${VERSION}
-  - sudo apt-get install xsltproc xmlstarlet wkhtmltopdf #l10n_mx packages
-  - sudo pip install SOAPpy #l10n_mx packages
-  - sudo pip install PyWebDAV #Default package required of odoo
-  - sudo pip install recaptcha-client egenix-mx-base #Required to import addons-vauxoo
-  #- sudo apt-get install openssl#l10n_mx packages openssl package is installed on travis and show a error
+  - travis_install_mx_nightly ${VERSION}
 
 script:
   - git clone https://github.com/vauxoo/addons-vauxoo ${HOME}/addons-vauxoo -b ${VERSION}
-  - wget https://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.11.0_rc1-static-amd64.tar.bz2
-  - bzip2 -dc wkhtmltopdf-0.11.0_rc1-static-amd64.tar.bz2 | tar -xv
-  - sudo cp wkhtmltopdf-amd64 /usr/bin/wkhtmltopdf
   #- travis_run_flake8 #first time many errors
   #- travis_run_pylint #first time many errors
   - travis_run_tests ${VERSION}
