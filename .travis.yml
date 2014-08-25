@@ -14,9 +14,9 @@ install:
   #- git clone https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   #- export PATH=${HOME}/maintainer-quality-tools/travis:${HOME}/odoo-mexico/odoo-mexico/travis:${PATH}
   #- travis_install_nightly ${VERSION}
-  - printf '\nls -Rt ${HOME}\nls -Rt .' > ls_rt.sh
-  - chmod +x ls_rt.sh
-  - ls_rt.sh
+  - printf '\nls -Rt ${HOME}\nls -Rt .' > ./ls_rt.sh
+  - chmod +x ./ls_rt.sh
+  - ./ls_rt.sh
   #- travis_install_mx_nightly ${VERSION}
 
 script:
