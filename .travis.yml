@@ -22,6 +22,9 @@ install:
 
 script:
   - git clone https://github.com/vauxoo/addons-vauxoo ${HOME}/addons-vauxoo -b ${VERSION}
+  - wget https://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.11.0_rc1-static-amd64.tar.bz2
+  - bzip2 -dc wkhtmltopdf-0.11.0_rc1-static-amd64.tar.bz2 | tar -xv
+  - sudo cp wkhtmltopdf-amd64 /usr/bin/wkhtmltopdf
   #- travis_run_flake8 #first time many errors
   #- travis_run_pylint #first time many errors
   - travis_run_tests ${VERSION}
