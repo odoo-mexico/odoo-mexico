@@ -18,6 +18,9 @@ install:
 
 script:
   #- travis_run_flake8
+  - echo "{HOME}"
+  - pwd
+  - ls
   - travis_run_pylint
   #- travis_run_tests ${VERSION}
 
