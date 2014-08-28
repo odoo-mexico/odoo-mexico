@@ -37,7 +37,6 @@ import base64
 import binascii
 import logging
 _logger = logging.getLogger(__name__)
-from l10n_mx_facturae_lib import facturae_lib
 
 all_paths = tools.config["addons_path"].split(",")
 for my_path in all_paths:
@@ -215,7 +214,7 @@ class facturae_certificate_library(osv.Model):
         """
         if context is None:
             context = {}
-        msj, app_xsltproc_fullpath, app_openssl_fullpath, app_xmlstarlet_fullpath = facturae_lib.library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
+        msj, app_xsltproc_fullpath, app_openssl_fullpath, app_xmlstarlet_fullpath = library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
         if not app_xsltproc_fullpath:
             raise osv.except_osv(_("Error!"), _(
                 "Failed to find in path '%s' app. This app is required for sign Mexican Electronic Invoice"%(app_xsltproc) ))
@@ -282,7 +281,7 @@ class facturae_certificate_library(osv.Model):
         """
         if context is None:
             context = {}
-        msj, app_xsltproc_fullpath, app_openssl_fullpath, app_xmlstarlet_fullpath = facturae_lib.library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
+        msj, app_xsltproc_fullpath, app_openssl_fullpath, app_xmlstarlet_fullpath = library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
         if not app_openssl_fullpath:
             raise osv.except_osv(_("Error!"), _(
                 "Failed to find in path '%s' app. This app is required for sign Mexican Electronic Invoice"%(app_openssl) ))
@@ -311,7 +310,7 @@ class facturae_certificate_library(osv.Model):
         if context is None:
             context = {}
         msj, app_xsltproc_fullpath, app_openssl_fullpath, app_xmlstarlet_fullpath = \
-                    facturae_lib.library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
+                    library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
         result = ""
         cmd = ''
         if type_key == 'PEM':
@@ -336,7 +335,7 @@ class facturae_certificate_library(osv.Model):
         #xmlstarlet val -e --xsd cfdv2.xsd cfd_example.xml
         if context is None:
             context = {}
-        msj, app_xsltproc_fullpath, app_openssl_fullpath, app_xmlstarlet_fullpath = facturae_lib.library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
+        msj, app_xsltproc_fullpath, app_openssl_fullpath, app_xmlstarlet_fullpath = library_openssl_xsltproc_xmlstarlet(cr, uid, ids, context)
         if app_xmlstarlet_fullpath:
             cmd = ''
             if type_scheme == 'xsd':
