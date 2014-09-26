@@ -4,6 +4,7 @@
 sudo apt-get install xsltproc xmlstarlet wkhtmltopdf
 #sudo apt-get install openssl #package openssl installed on travis and show a error
 sudo pip install SOAPpy #l10n_mx packages
+sudo pip install M2Crypto #l10n_mx packages
 
 ##ADDONS-VAUXOO PACKAGES#FIXME: This modules make error use or not use it
 sudo pip install recaptcha-client egenix-mx-base
